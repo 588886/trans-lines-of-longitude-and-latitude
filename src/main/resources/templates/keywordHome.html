@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/img/logo.ico" />
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+
+    <div>
+        <div class="container">
+            <div class="containerHead">
+                <p><span>키워드검색</span>으로 위·경도 구하기</p>
+                <a href="/">주소검색</a>
+            </div>
+            <div class="addressSearch">
+                <input type="text" id="address" placeholder="  주소">
+                <input type="button" onclick="execDaumPostcode()" class="addressButton" value="키워드 검색">
+            </div>
+            <div class="mapAndAddressInfo">
+                <div id="map"></div>
+                <div id="addressInfoBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ca9a189e92b6375b591bf737c4cb14ec&libraries=services"></script>
+    <script>
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+        mapOption = {
+            center: new daum.maps.LatLng(37.537187, 127.005476), // 지도의 중심좌표
+            level: 5 // 지도의 확대 레벨
+        };
+
+        //지도를 미리 생성
+        var map = new daum.maps.Map(mapContainer, mapOption);
+        //주소-좌표 변환 객체를 생성
+        var geocoder = new kakao.maps.services.Geocoder();
+		var adress=document.get
+		// 주소로 좌표를 검색합니다
+		geocoder.addressSearch('${vo.adress }', function(result, status) {
+			
+		    // 정상적으로 검색이 완료됐으면 
+		     if (status === kakao.maps.services.Status.OK) {
+
+		        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+				
+		        // 결과값으로 받은 위치를 마커로 표시합니다
+		        var marker = new kakao.maps.Marker({
+		            map: map,
+		            position: coords
+		        });
+		       
+		        // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+		        map.setCenter(coords);
+		    } 
+
+
+		}); 
+
+        var places = new kakao.maps.services.Places();
+		// 키워드 검색 완료 시 호출되는 콜백함수 입니다
+		var callback = function(result, status) {
+		    if (status === kakao.maps.services.Status.OK) {
+			        var placeid = result[0].id;
+			        var placeurl = "https://place.map.kakao.com/main/v/"+placeid;
+			        var jihachul_data = '';
+		    		var gansun=[];
+		    		var jisun=[];
+		    		var gwang=[];
+		    		var nong=[];
+			        var bus_data = '';
+			        $.ajax({
+			    		url: "<c:url value='/info'/>",
+			    		data: { placeurl: placeurl }
+			    	}).done(function( response ){
+			    		console.log( 'result12',response)
+				        jihachul_data = '';
+			    		$( response.findway.subway ).each(function(){
+			    			jihachul_data += 
+			    			`<span class="jihachul1">광주 1호선</span><p class="jihachulp">\${this.stationSimpleName} │ \${this.exitNum}번 출구 도보\${this.toExitMinute}분</p>
+			    			`;
+			    		})
+			    		$("#jihacul-list").html( jihachul_data )
+			    		
+				        
+			    		$( response.findway.busstop ).each(function(){
+			    			for(i=0;i<this.busInfo.length;i++){
+			    				if(this.busInfo[i].busType=='지선'){
+			    					jisun.push(...this.busInfo[i].busNames.split(", "))
+			    				}else if(this.busInfo[i].busType=='간선'){
+			    					gansun.push(...this.busInfo[i].busNames.split(", "))
+			    				}else if(this.busInfo[i].busType=='광역'){
+			    					gwang.push(...this.busInfo[i].busNames.split(", "))
+			    				}else if(this.busInfo[i].busType=='농어촌'){
+			    					nong.push(...this.busInfo[i].busNames.split(", "))
+			    				}
+			    			}
+			    			
+
+			    		})
+			    		var resultjisun = jisun.reduce((unique, item) => {
+			    			  return unique.includes(item) ? unique : [...unique, item];
+			    		}, []);
+			    		var resultgansun = gansun.reduce((unique, item) => {
+			    			  return unique.includes(item) ? unique : [...unique, item];
+			    		}, []);
+			    		var resultgwang = gwang.reduce((unique, item) => {
+			    			  return unique.includes(item) ? unique : [...unique, item];
+			    		}, []);
+			    		var resultnong = nong.reduce((unique, item) => {
+			    			  return unique.includes(item) ? unique : [...unique, item];
+			    		}, []);
+			    		var jisunText='';
+			    		var gansunText='';
+			    		var gwangText='';
+			    		var nongText='';
+			    		for(i=0;i<resultjisun.length;i++){
+			    			if(i==resultjisun.length-1){
+			    				jisunText+=resultjisun[i];
+			    			}else{
+			    				jisunText+=resultjisun[i]+' | ';
+			    			}
+			    		}
+			    		for(i=0;i<resultgansun.length;i++){
+			    			if(i==resultgansun.length-1){
+			    				gansunText+=resultgansun[i];
+			    			}else{
+			    				gansunText+=resultgansun[i]+' | ';
+			    			}
+			    		}
+			    		for(i=0;i<resultgwang.length;i++){
+			    			if(i==resultgwang.length-1){
+			    				gwangText+=resultgwang[i];
+			    			}else{
+			    				gwangText+=resultgwang[i]+' | ';
+			    			}
+			    		}
+			    		for(i=0;i<resultnong.length;i++){
+			    			if(i==resultnong.length-1){
+			    				nongText+=resultnong[i];
+			    			}else{
+			    				nongText+=resultnong[i]+' | ';
+			    			}
+			    		}
+			    		bus_data = '';
+			    		if(resultgansun.length>0){
+			    			bus_data +=
+			    				`<div class="buswrap"><div class="busimg"><span class="busgansun">간선</span></div><div><p class="busp">`+gansunText+'</p></div></div>';
+			    		}
+			    		if(resultjisun.length>0){
+			    			bus_data +=
+			    				`<div class="buswrap"><div class="busimg"><span class="busjisun">지선</span></div><div><p class="busp">`+jisunText+'</p></div></div>';
+			    		}
+			    		if(resultgwang.length>0){
+			    			bus_data +=
+			    				`<div class="buswrap"><div class="busimg"><span class="busgwang">지선</span></div><div><p class="busp">`+gwangText+'</p></div></div>';
+			    		}
+			    		if(resultnong.length>0){
+			    			bus_data +=
+			    				`<div class="buswrap"><div class="busimg"><span class="busnung">농어촌</span></div><div><p class="busp">`+nongText+'</p></div></div>';
+			    		}
+			    		$("#bus-list").html( bus_data )
+			    	})
+			    }
+		};
+		places.keywordSearch('${vo.adress }', callback);
+    </script>
+</body>
+</html>
