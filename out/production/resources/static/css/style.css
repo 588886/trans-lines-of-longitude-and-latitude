@@ -1,0 +1,92 @@
+body{
+    background: gray;
+}
+
+.containerHead{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.containerHead p{
+    text-align: center;
+    margin: 15px;
+    font-size: xxx-large;
+    font-family: serif;
+    font-weight: bolder;
+    color: beige;
+}
+
+.containerHead span{
+    color: aliceblue;
+    font-size: xxx-large;
+}
+
+.containerHead a{
+    font-size: xx-large;
+    color: blueviolet;
+    background-color: aliceblue;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.container{
+    width: 60vw;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin-top: 30vh;
+}
+
+.addressSearch{
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
+}
+
+#address{
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.addressButton{
+    width: 20%;
+    height: 100%;
+    margin-left: 10px;
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.mapAndAddressInfo{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    min-height: 300px;
+    max-height: 600px;
+    margin-top:10px;
+}
+
+#map{
+    width:30%;
+    display:none
+}
+
+#addressInfoBox{
+    width: 70%;
+    margin-left: 10px;
+    background-color: dimgray;
+    display: none;
+}
+
+#oldAddress,#newAddress,#latitudeVal,#longitudeVal{
+    display: flex;
+    gap: 5px;
+    margin: 10px 5px;
+    font-size: xx-large;
+    color: aliceblue;
+    font-family: serif;
+}
